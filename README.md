@@ -23,19 +23,26 @@ players = [
 👇
 
 ```
-slug                                             startAt            
-tournament/port-priority-8-5                     2023-11-10 15:00:00    9
-tournament/ludwig-smash-invitational             2022-10-21 13:00:00    9
-tournament/genesis-9-1                           2023-01-20 12:00:00    9
-tournament/double-down-2022                      2022-07-08 07:00:00    8
-tournament/genesis-x                             2024-02-16 13:00:00    8
-                                                                       ..
-tournament/icarus-v                              2019-04-27 04:00:00    1
-tournament/icarus-2023                           2023-06-03 03:00:00    1
-tournament/ibp-masters-showdown                  2017-11-11 15:00:00    1
-tournament/ib-games-4-the-end-of-sisqui-s-reign  2023-06-01 12:00:00    1
-tournament/ya-es-viernes-3-bici-weekly-1         2020-07-10 23:30:00    1
-Length: 2031, dtype: int64
+2023-01 genesis-9-1 → Tweek, MkLeo, Sparg0, Light, あcola, Glutonny, Riddles, Tea
+2023-11 port-priority-8-5 → Tweek, MkLeo, Sparg0, Light, あcola, Glutonny, Riddles, Tea
+2022-10 ludwig-smash-invitational → Tweek, MkLeo, Sparg0, Light, あcola, Glutonny, Riddles, Tea
+2022-07 double-down-2022 → Tweek, MkLeo, Sparg0, Light, Glutonny, Riddles, Tea
+2021-11 instage-2021 → Tweek, MkLeo, Sparg0, Light, Glutonny, Riddles, Tea
+2019-12 2gg-kongo-saga → Tweek, MkLeo, Sparg0, Light, Glutonny, Riddles, Tea
+2022-09 smash-ultimate-summit-5-presented-by-coinbase → Tweek, MkLeo, Sparg0, Light, あcola, Glutonny, Riddles
+2023-05 battle-of-bc-5-5 → Tweek, MkLeo, Sparg0, Light, あcola, Glutonny, Riddles
+2024-02 genesis-x → Tweek, MkLeo, Sparg0, Light, Glutonny, Riddles, Tea
+2022-12 scuffed-world-tour → Tweek, MkLeo, Sparg0, Light, あcola, Glutonny, Riddles
+2023-12 watch-the-throne → Tweek, MkLeo, Sparg0, Light, あcola, Glutonny
+2020-02 frostbite-2020 → Tweek, MkLeo, Light, Glutonny, Riddles, Tea
+2022-03 smash-ultimate-summit-4 → Tweek, MkLeo, Sparg0, Light, Glutonny, Tea
+2019-04 2gg-prime-saga-1 → Tweek, MkLeo, Sparg0, Light, Glutonny, Tea
+2022-04 genesis-8 → Tweek, MkLeo, Sparg0, Light, Glutonny, Riddles
+2023-01 let-s-make-big-moves-2023 → Tweek, MkLeo, Sparg0, Light, Glutonny, Riddles
+2022-08 super-smash-con-2022 → Tweek, MkLeo, Light, あcola, Glutonny, Riddles
+2023-03 smash-ultimate-summit-6 → Tweek, MkLeo, Sparg0, あcola, Glutonny, Riddles
+2022-03 collision-2022 → Tweek, MkLeo, Sparg0, Light, Glutonny, Riddles
+2024-05 12-kagaribi-12 → MkLeo, Sparg0, あcola, Glutonny, Tea
 ```
 
 ## Output
