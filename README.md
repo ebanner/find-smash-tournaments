@@ -1,6 +1,6 @@
 # find-smash-tournaments
 
-Find smash tournaments with my favorite players
+Find smash tournaments that my favorite players are competing in
 
 ## What is this?
 
