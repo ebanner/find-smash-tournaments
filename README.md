@@ -65,3 +65,7 @@ Tweek,tournament/genesis-x,2024-02-16 13:00:00
 ## Why?
 
 Basically, I just want to know what the biggest smash tournaments are so I can watch them
+
+## Data Source
+
+All data comes from the [start.gg Developer API](https://developer.start.gg/docs/intro/) - thank you!
