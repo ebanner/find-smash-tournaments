@@ -68,4 +68,4 @@ Basically, I just want to know what the biggest smash tournaments are so I can w
 
 ## Data Source
 
-All data comes from the [start.gg Developer API](https://developer.start.gg/docs/intro/) - thank you!
+All data comes from the [start.gg GraphQL API](https://developer.start.gg/docs/intro/) - thank you!
