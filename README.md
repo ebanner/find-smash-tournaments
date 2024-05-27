@@ -48,3 +48,15 @@ Basically, I just want to know what the biggest smash tournaments are so I can w
 ## Data Source
 
 All data comes from the [start.gg GraphQL API](https://developer.start.gg/docs/intro/) - thank you!
+
+## 2024
+
+![image](https://github.com/ebanner/find-smash-tournaments/assets/2068912/9a7fecf3-5d2e-4ece-848e-86178fc4b468)
+
+## 2023
+
+![image](https://github.com/ebanner/find-smash-tournaments/assets/2068912/7e6cfb3b-6698-43a0-9d88-a03aec30afc2)
+
+## 2022
+
+![image](https://github.com/ebanner/find-smash-tournaments/assets/2068912/21210e77-edd9-40b6-81e7-53d169721397)
