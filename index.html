@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Smash Tournaments</title>
+    <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+<style>
+    table {
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        border: 1px solid black; /* Creates grid lines */
+    }
+</style>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function makeDense(participants, players) {
+            const dense = [...Array(players.length)].fill(0);
+            for (const [i, player] of players.entries()) {
+                if (participants.includes(player)) {
+                    dense[i] = 1;
+                }
+            }
+            return dense;
+        }
+
+        function main(data) {
+            var { tournaments, players } = data;
+
+            tournaments = tournaments.filter(tournament => tournament.gamertag.length > 1)
+
+            // Make dense tournament participants
+            for (const tournament of tournaments) {
+                tournament['dense'] = makeDense(tournament.gamertag, players)
+            }
+
+            // Count up number of participants
+            for (const tournament of tournaments) {
+                tournament['numParticipants'] = tournament.gamertag.length;
+            }
+
+            function App() {
+                return (
+                    <>
+                        <h1>2024 Smash Tournaments</h1>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Number of participants</th>
+                                    <th>Tournament</th>
+                                    <th>Date</th>
+                                    {players.map(player => <th>{player}</th>)}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {tournaments.map(tournament =>
+                                    <tr style={{ backgroundColor: tournament.numParticipants === 9 ? '#ffcccc' : '' }}>
+                                        <td>{tournament.numParticipants}</td>
+                                        <td>{tournament.slug}</td>
+                                        <td>{tournament.startAt}</td>
+                                        {tournament.dense.map(present =>
+                                            <td>{present == 1 ? '✅' : ''}</td>
+                                        )}
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </>
+                );
+            }
+            
+            ReactDOM.render(<App />, document.getElementById('root'));
+        }
+
+        fetch('http://localhost:5001')
+            .then(response => response.json())  // Parses JSON automatically
+            .then(data => main(data));
+    </script>
+</body>
+
+</html>
