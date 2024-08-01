@@ -37,6 +37,7 @@
             var { tournaments, players } = data;
 
             tournaments = tournaments.filter(tournament => tournament.gamertag.length > 1)
+            tournaments.reverse()
 
             // Make dense tournament participants
             for (const tournament of tournaments) {
@@ -51,37 +52,37 @@
             function App() {
                 return (
                     <>
-                      <div class="container mt-4">
-                        <h1>2024 Smash Tournaments</h1>
-                        <div class="table-responsive">
-                        <table class="table table-striped table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Number of participants</th>
-                                    <th>Tournament</th>
-                                    <th>Date</th>
-                                    {players.map(player => <th>{player}</th>)}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {tournaments.map(tournament =>
-                                    <tr style={{ backgroundColor: tournament.numParticipants === 9 ? '#ffcccc' : '' }}>
-                                        <td>{tournament.numParticipants}</td>
-                                        <td>{tournament.slug}</td>
-                                        <td>{tournament.startAt}</td>
-                                        {tournament.dense.map(present =>
-                                            <td>{present == 1 ? '✅' : ''}</td>
+                        <div class="container mt-4">
+                            <h1>2024 Smash Tournaments</h1>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Number of participants</th>
+                                            <th>Tournament</th>
+                                            <th>Date</th>
+                                            {players.map(player => <th>{player}</th>)}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {tournaments.map(tournament =>
+                                            <tr style={{ backgroundColor: tournament.numParticipants === 9 ? '#ffcccc' : '' }}>
+                                                <td>{tournament.numParticipants}</td>
+                                                <td>{tournament.slug}</td>
+                                                <td>{tournament.startAt}</td>
+                                                {tournament.dense.map(present =>
+                                                    <td>{present == 1 ? '✅' : ''}</td>
+                                                )}
+                                            </tr>
                                         )}
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                        </div>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </>
                 );
             }
-            
+
             ReactDOM.render(<App />, document.getElementById('root'));
         }
 
