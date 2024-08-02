@@ -63,9 +63,47 @@
                 tournament['formattedDate'] = getFormattedDate(tournament.startAt)
             }
 
+            const now = new Date();
+
+            // Get upcoming tournaments
+            const upcomingTournaments = tournaments.filter(tournament => now < new Date(tournament.startAt * 1000))
+
+            // Get 2024 tournaments
+            const _2024tournaments = tournaments.filter(tournament => {
+                const tournamentDate = new Date(tournament.startAt * 1000)
+                return tournamentDate.getFullYear() == 2024 && tournamentDate <= now
+            })
+
             function App() {
                 return (
                     <>
+                        <div class="container mt-4">
+                            <h1>Upcoming Smash Tournaments</h1>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Number of participants</th>
+                                            <th>Tournament</th>
+                                            <th>Date</th>
+                                            {players.map(player => <th>{player}</th>)}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {upcomingTournaments.map(tournament =>
+                                            <tr style={{ backgroundColor: tournament.numParticipants === 9 ? '#ffcccc' : '' }}>
+                                                <td>{tournament.numParticipants}</td>
+                                                <td>{tournament.slug}</td>
+                                                <td>{tournament.formattedDate}</td>
+                                                {tournament.dense.map(present =>
+                                                    <td>{present == 1 ? '✅' : ''}</td>
+                                                )}
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                         <div class="container mt-4">
                             <h1>2024 Smash Tournaments</h1>
                             <div class="table-responsive">
@@ -79,7 +117,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {tournaments.map(tournament =>
+                                        {_2024tournaments.map(tournament =>
                                             <tr style={{ backgroundColor: tournament.numParticipants === 9 ? '#ffcccc' : '' }}>
                                                 <td>{tournament.numParticipants}</td>
                                                 <td>{tournament.slug}</td>
