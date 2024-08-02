@@ -42,15 +42,11 @@ def get_data(player_id, page, PER_PAGE=490):
     query = """
       query PlayerQuery {
       player(id: "{player_id}") {
-        id
-        gamerTag
-        sets(page: {page}, perPage: 490) {
-          nodes {
-            event {
-              tournament {
-                slug
-                startAt
-              }
+        user {
+          tournaments(query: { page: {page}, perPage: 500 }) {
+            nodes {
+              slug
+              startAt
             }
           }
         }
@@ -70,8 +66,7 @@ def get_data(player_id, page, PER_PAGE=490):
 
 
 def get_events(result):
-    events = result['data']['player']['sets']['nodes']
-    events = [event['event']['tournament'] for event in events]
+    events = result['data']['player']['user']['tournaments']['nodes']
     return events
 
 def make_df(gamertag, events):
