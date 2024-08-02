@@ -31,6 +31,15 @@
             return dense;
         }
 
+        function getFormattedDate(timestamp) {
+            const timestampInMilliSeconds = timestamp * 1000;
+            const date = new Date(timestampInMilliSeconds);
+            const formattedDate = date.toLocaleDateString('en-US', {
+                year: 'numeric', month: 'numeric', day: 'numeric'
+            });
+            return formattedDate;
+        }
+
         function main(data) {
             console.log(data);
 
@@ -47,6 +56,11 @@
             // Count up number of participants
             for (const tournament of tournaments) {
                 tournament['numParticipants'] = tournament.gamertag.length;
+            }
+
+            // Count up number of participants
+            for (const tournament of tournaments) {
+                tournament['formattedDate'] = getFormattedDate(tournament.startAt)
             }
 
             function App() {
@@ -69,7 +83,7 @@
                                             <tr style={{ backgroundColor: tournament.numParticipants === 9 ? '#ffcccc' : '' }}>
                                                 <td>{tournament.numParticipants}</td>
                                                 <td>{tournament.slug}</td>
-                                                <td>{tournament.startAt}</td>
+                                                <td>{tournament.formattedDate}</td>
                                                 {tournament.dense.map(present =>
                                                     <td>{present == 1 ? '✅' : ''}</td>
                                                 )}

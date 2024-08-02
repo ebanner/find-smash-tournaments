@@ -32,6 +32,15 @@ def delete(key):
 def lambda_handler(event, context):
     tournaments_json = get('tournaments.json')
     tournaments = json.loads(tournaments_json)
+
+    df = pd.DataFrame(tournaments)
+    df[df.startAt.apply(
+        lambda ts: datetime.datetime.fromtimestamp(ts).year
+    ) == 2024]\
+        .reset_index(drop=True)\
+        .to_dict(orient='records')
+
+    tournaments = json.loads(tournaments_json)
     players = [ 
         'Tweek',
         'MkLeo',

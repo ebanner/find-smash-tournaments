@@ -3,6 +3,8 @@ import pandas as pd
 from datetime import datetime
 import requests
 
+import os
+
 import json
 
 import boto3
@@ -54,12 +56,12 @@ def get_data(player_id, page, PER_PAGE=490):
         }
       }
     }""".replace('{page}', str(page)).replace('{player_id}', str(player_id))
-
+    
     token = os.environ['START_GG_TOKEN']
-    headers = {
+    headers = { 
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {token}'  # if authentication is needed
-    }
+    }   
     
     response = requests.post(url, json={'query': query}, headers=headers)
     result = response.json()
@@ -72,19 +74,9 @@ def get_events(result):
     events = [event['event']['tournament'] for event in events]
     return events
 
-def get_datetime(timestamp):
-    # Convert timestamp to datetime object
-    datetime_object = datetime.fromtimestamp(timestamp)
-    
-    # Format datetime object as a readable string
-    readable_date_time = datetime_object.strftime("%m-%Y")
-    
-    return readable_date_time
-
 def make_df(gamertag, events):
     df = pd.DataFrame(events)
     df = df.drop_duplicates().reset_index(drop=True)
-    df['startAt'] = df.startAt.map(lambda ts: get_datetime(ts))
     df['gamertag'] = gamertag
     reordered_df = df[['gamertag', 'slug', 'startAt']]
     return reordered_df
@@ -124,16 +116,8 @@ def lambda_handler(event, context):
     
     event_df.slug = event_df.slug.map(lambda event: event.lstrip('tournament/')) # TODO do upstream
     
-    
-    #
-    # Make JSON
-    #
-    print(event_df)
-    event_df['year'] = event_df.startAt.apply(lambda x: int(x.split('-')[1]))
-    df_2024 = event_df[event_df.year == 2024].reset_index(drop=True)
-    
     sorted_grouped_data = sorted(
-        df_2024.groupby('slug'),
+        event_df.groupby('slug'),
         key=lambda x: x[1]['startAt'].iloc[0]
     )
     
@@ -152,7 +136,7 @@ def lambda_handler(event, context):
 
     return {
         'statusCode': 200,
-        'body': json.dumps('Success!')
+        'body': 'Success!'
     }
 
 
