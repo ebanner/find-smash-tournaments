@@ -36,7 +36,7 @@ def delete(key):
     s3.delete_object(Bucket=BUCKET, Key=key)
 
 
-def get_data(player_id, page, PER_PAGE=490):
+def fetch_tournament_data(player_id, page, PER_PAGE=490):
     url = 'https://api.start.gg/gql/alpha'
     
     query = """
@@ -65,29 +65,42 @@ def get_data(player_id, page, PER_PAGE=490):
     return result
 
 
-def get_events(result):
-    events = result['data']['player']['user']['tournaments']['nodes']
-    return events
+TOURNAMENT_TO_EVENT = {
+    '12-with-kowloon-12-with-kagaribi': 'sp-ultimate-singles',
+    'genesis-x': 'ultimate-singles',
+}
 
-def make_df(gamertag, events):
-    df = pd.DataFrame(events)
+
+def get_tournaments(result):
+    tournaments = result['data']['player']['user']['tournaments']['nodes']
+    for tournament in tournaments:
+        slug = tournament['slug'].lstrip('tournament/')
+        tournament['event'] = TOURNAMENT_TO_EVENT.get(slug, '')
+        tournament['slug'] = slug
+    return tournaments
+
+
+def make_df(gamertag, tournaments):
+    df = pd.DataFrame(tournaments)
     df = df.drop_duplicates().reset_index(drop=True)
     df['gamertag'] = gamertag
-    reordered_df = df[['gamertag', 'slug', 'startAt']]
+    reordered_df = df[['gamertag', 'slug', 'startAt', 'event']]
     return reordered_df
 
-def get_all_events(player_id):
+
+def get_all_tournaments(player_id):
     page = 1
-    all_events = []
+    all_tournaments = []
     while True:
         # print('page', page)
-        result = get_data(player_id, page)
-        events = get_events(result)
-        if events == []:
+        result = fetch_tournament_data(player_id, page)
+        tournaments = get_tournaments(result)
+        if tournaments == []:
             break
-        all_events.extend(events)
+        all_tournaments.extend(tournaments)
         page += 1
-    return all_events
+    return all_tournaments
+
 
 def lambda_handler(event, context):
     players = [
@@ -103,13 +116,11 @@ def lambda_handler(event, context):
         {"gamertag": "Kola", "id": 18802},
     ]
     
-    event_df = pd.DataFrame(columns=['gamertag', 'slug', 'startAt'])
+    event_df = pd.DataFrame(columns=['gamertag', 'slug', 'startAt', 'event'])
     for player in players:
-        events = get_all_events(player['id'])
-        df = make_df(player['gamertag'], events)
+        tournaments = get_all_tournaments(player['id'])
+        df = make_df(player['gamertag'], tournaments)
         event_df = pd.concat([event_df, df]).reset_index(drop=True)
-    
-    event_df.slug = event_df.slug.map(lambda event: event.lstrip('tournament/')) # TODO do upstream
     
     sorted_grouped_data = sorted(
         event_df.groupby('slug'),
@@ -120,7 +131,8 @@ def lambda_handler(event, context):
         {
             'slug': group['slug'].iloc[0],
             'startAt': group['startAt'].iloc[0],
-            'gamertag': group['gamertag'].tolist()
+            'gamertag': group['gamertag'].tolist(),
+            'event': group['event'].iloc[0],
         }
         for _, group in sorted_grouped_data
     ]
@@ -133,5 +145,4 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': 'Success!'
     }
-
 

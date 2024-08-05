@@ -53,6 +53,13 @@
                 tournament['dense'] = makeDense(tournament.gamertag, players)
             }
 
+            // Get links to events
+            for (const tournament of tournaments) {
+                if (tournament.event !== '') {
+                    tournament['url'] = `https://www.start.gg/tournament/${tournament.slug}/event/${tournament.event}/overview`
+                }
+            }
+
             // Count up number of participants
             for (const tournament of tournaments) {
                 tournament['numParticipants'] = tournament.gamertag.length;
@@ -93,7 +100,7 @@
                                         {upcomingTournaments.map(tournament =>
                                             <tr style={{ backgroundColor: tournament.numParticipants === 9 ? '#ffcccc' : '' }}>
                                                 <td>{tournament.numParticipants}</td>
-                                                <td>{tournament.slug}</td>
+                                                <td>{'url' in tournament ? <a href={tournament.url}>{tournament.slug}</a> : tournament.slug}</td>
                                                 <td>{tournament.formattedDate}</td>
                                                 {tournament.dense.map(present =>
                                                     <td>{present == 1 ? '✅' : ''}</td>
@@ -120,7 +127,7 @@
                                         {_2024tournaments.map(tournament =>
                                             <tr style={{ backgroundColor: tournament.numParticipants === 9 ? '#ffcccc' : '' }}>
                                                 <td>{tournament.numParticipants}</td>
-                                                <td>{tournament.slug}</td>
+                                                <td>{'url' in tournament ? <a href={tournament.url}>{tournament.slug}</a> : tournament.slug}</td>
                                                 <td>{tournament.formattedDate}</td>
                                                 {tournament.dense.map(present =>
                                                     <td>{present == 1 ? '✅' : ''}</td>
