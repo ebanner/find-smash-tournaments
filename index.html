@@ -100,7 +100,7 @@
                                         {upcomingTournaments.map(tournament =>
                                             <tr style={{ backgroundColor: tournament.numParticipants === 9 ? '#ffcccc' : '' }}>
                                                 <td>{tournament.numParticipants}</td>
-                                                <td>{'url' in tournament ? <a href={tournament.url}>{tournament.slug}</a> : tournament.slug}</td>
+                                                <td>{'url' in tournament ? <a href={tournament.url}>{tournament.name}</a> : tournament.name}</td>
                                                 <td>{tournament.formattedDate}</td>
                                                 {tournament.dense.map(present =>
                                                     <td>{present == 1 ? '✅' : ''}</td>
@@ -127,7 +127,7 @@
                                         {_2024tournaments.map(tournament =>
                                             <tr style={{ backgroundColor: tournament.numParticipants === 9 ? '#ffcccc' : '' }}>
                                                 <td>{tournament.numParticipants}</td>
-                                                <td>{'url' in tournament ? <a href={tournament.url}>{tournament.slug}</a> : tournament.slug}</td>
+                                                <td>{'url' in tournament ? <a href={tournament.url}>{tournament.name}</a> : tournament.name}</td>
                                                 <td>{tournament.formattedDate}</td>
                                                 {tournament.dense.map(present =>
                                                     <td>{present == 1 ? '✅' : ''}</td>

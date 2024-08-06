@@ -45,6 +45,7 @@ def fetch_tournament_data(player_id, page, PER_PAGE=490):
         user {
           tournaments(query: { page: {page}, perPage: 500 }) {
             nodes {
+              name
               slug
               startAt
             }
@@ -118,7 +119,7 @@ def make_df(gamertag, tournaments):
     df = pd.DataFrame(tournaments)
     df = df.drop_duplicates().reset_index(drop=True)
     df['gamertag'] = gamertag
-    reordered_df = df[['gamertag', 'slug', 'startAt', 'event']]
+    reordered_df = df[['gamertag', 'name', 'slug', 'startAt', 'event']]
     return reordered_df
 
 
@@ -150,7 +151,7 @@ def lambda_handler(event, context):
         {"gamertag": "Kola", "id": 18802},
     ]
     
-    event_df = pd.DataFrame(columns=['gamertag', 'slug', 'startAt', 'event'])
+    event_df = pd.DataFrame(columns=['gamertag', 'name', 'slug', 'startAt', 'event'])
     for player in players:
         tournaments = get_all_tournaments(player['id'])
         df = make_df(player['gamertag'], tournaments)
@@ -163,6 +164,7 @@ def lambda_handler(event, context):
     
     tournaments = [
         {
+            'name': group['name'].iloc[0],
             'slug': group['slug'].iloc[0],
             'startAt': group['startAt'].iloc[0],
             'gamertag': group['gamertag'].tolist(),
