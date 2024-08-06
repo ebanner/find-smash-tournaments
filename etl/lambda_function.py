@@ -65,16 +65,50 @@ def fetch_tournament_data(player_id, page, PER_PAGE=490):
     return result
 
 
-TOURNAMENT_TO_EVENT = {
+TOURNAMENT_TO_EVENT = { 
     '12-with-kowloon-12-with-kagaribi': 'sp-ultimate-singles',
     'genesis-x': 'ultimate-singles',
+    'supernova-2024': 'ultimate-1v1-singles',
+    "ultimate-fighting-arena-2024-3": "super-smash-bros-ultimate-solo-switch",
+    "s-factor-11": "smash-bros-ultimate-singles",
+    "pre-s-factor-11": "ultimate-singles",
+    "ceo-2024-6": "super-smash-bros-ultimate-1v1",
+    "the-coinbox-105": "ultimate-singles",
+    "the-to-go-box-3-ultimate-final-smash-meter-on": "ultimate-singles",
+    "the-to-go-box-2-ultimate-sonic-steve-pikachu-banned": "ultimate-singles",
+    "con-2024-7": "ssbu-1v1",
+    "the-coinbox-102": "ultimate-singles",
+    "get-on-my-level-x-canadian-fighting-game-championships": "super-smash-bros-ultimate-singles",
+    "delta-8": "singles",
+    "lvl-up-expo-2024": "smash-ultimate-singles-starts-saturday",
+    "kroger-gaming-presents-the-luminosity-invitational": "ultimate-singles",
+    "diamond-dust": "ultimate-singles",
+    "battle-of-bc-6-7": "ultimate-singles",
+    "the-pregame-bobc6-pre-event": "ultimate-singles",
+    "the-coinbox-97-steve-banned": "ultimate-singles",
+    "best-of-the-west-ii-misfire": "ultimate-singles",
+    "the-coinbox-96-steve-banned": "ultimate-singles",
+    "collision-2024-6": "ultimate-singles",
+    "the-coinbox-95-steve-banned": "ultimate-singles",
+    "bonito-harbor": "ultimate-singles",
+    "cirque-du-cfl-3-ft-zomba-moist-light-miya-asimo": "smash-ultimate-1v1",
+    "the-coinbox-94-steve-unbanned": "ultimate-singles",
+    "the-coinbox-93-steve-banned": "ultimate-singles",
+    "king-con": "ssbu-1v1",
+    "d-jo-106": "ultimate-singles",
+    "pre-genesis-x-at-guildhouse-ultimate-melee-sf6": "smash-ultimate-singles-switch-6-00-pm",
+    "the-coinbox-89-steve-banned": "ultimate-singles",
+    "the-coinbox-87": "ultimate-singles",
+    "9with": "kowloon",
+    "sp-10-umeburasp-10": "singles",
+    "luminosity-makes-big-moves-2024": "ultimate-singles",
 }
 
 
 def get_tournaments(result):
     tournaments = result['data']['player']['user']['tournaments']['nodes']
     for tournament in tournaments:
-        slug = tournament['slug'].lstrip('tournament/')
+        slug = tournament['slug'].removeprefix('tournament/')
         tournament['event'] = TOURNAMENT_TO_EVENT.get(slug, '')
         tournament['slug'] = slug
     return tournaments
