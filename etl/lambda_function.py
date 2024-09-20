@@ -3,6 +3,10 @@ import pandas as pd
 from datetime import datetime
 import requests
 
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 import os
 
 import json
@@ -13,6 +17,62 @@ import boto3
 s3 = boto3.client('s3')
 
 BUCKET = 'smash-tournaments'
+
+
+def get_gmail_app_password():
+
+    secret_name = "GMAIL_APP_PASSWORD"
+    region_name = "us-east-1"
+
+    # Create a Secrets Manager client
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
+
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        # For a list of exceptions thrown, see
+        # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+        raise e
+
+    secret_json = get_secret_value_response['SecretString']
+
+    secret_dict = json.loads(secret_json)
+    gmail_app_password = secret_dict[secret_name]
+    return gmail_app_password
+
+
+def send_email(subject, body):
+    # Set up the sender and receiver emails
+    sender_email = os.environ['SENDER_EMAIL']
+    receiver_email = os.environ['RECIPIENT_EMAIL']
+    password = get_gmail_app_password() # Use an app-specific password or OAuth for security
+
+    # Create a MIMEMultipart object
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = receiver_email
+    msg['Subject'] = subject
+
+    # Attach the body to the email
+    msg.attach(MIMEText(body, 'plain'))
+
+    # Set up the Gmail server
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)  # Use Gmail's SMTP server
+        server.starttls()  # Start the server in TLS mode
+        server.login(sender_email, password)  # Log in to your Gmail account
+        server.sendmail(sender_email, receiver_email, msg.as_string())  # Send the email
+        print("Email sent successfully!")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+    finally:
+        server.quit()  # Close the connection
 
 
 def put(key, value):
@@ -103,6 +163,9 @@ TOURNAMENT_TO_EVENT = {
     "9with": "kowloon",
     "sp-10-umeburasp-10": "singles",
     "luminosity-makes-big-moves-2024": "ultimate-singles",
+    "the-coinbox-110": "ultimate-singles",
+    "regen-2024": "ultimate-singles-sat-sun",
+    "riptide-2024-5": "ultimate-singles",
 }
 
 
@@ -175,6 +238,17 @@ def lambda_handler(event, context):
     
     tournaments_json = json.dumps(tournaments)
     
+
+    #
+    # Compare and see if there's a new tournament
+    #
+    existing_tournaments = get('tournaments.json')
+    if tournaments_json != existing_tournaments:
+        send_email(
+            'New tournament added!',
+            'Check https://ebanner.github.io/find-smash-tournaments for updates.'
+        )
+
     put('tournaments.json', tournaments_json)
 
     return {
