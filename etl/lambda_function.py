@@ -35,7 +35,7 @@ def get_gmail_app_password():
         get_secret_value_response = client.get_secret_value(
             SecretId=secret_name
         )
-    except ClientError as e:
+    except Exception as e:
         # For a list of exceptions thrown, see
         # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
         raise e
@@ -100,19 +100,21 @@ def fetch_tournament_data(player_id, page, PER_PAGE=490):
     url = 'https://api.start.gg/gql/alpha'
     
     query = """
-      query PlayerQuery {
+    query PlayerQuery {
       player(id: "{player_id}") {
         user {
-          tournaments(query: { page: {page}, perPage: 500 }) {
+          events(query: { page: {page}, perPage: {per_page} }) {
             nodes {
-              name
+              tournament {
+                name
+              }
               slug
               startAt
             }
           }
         }
       }
-    }""".replace('{page}', str(page)).replace('{player_id}', str(player_id))
+    }""".replace('{page}', str(page)).replace('{player_id}', str(player_id)).replace('{per_page}', str(PER_PAGE))
     
     token = os.environ['START_GG_TOKEN']
     headers = { 
@@ -126,55 +128,11 @@ def fetch_tournament_data(player_id, page, PER_PAGE=490):
     return result
 
 
-TOURNAMENT_TO_EVENT = { 
-    '12-with-kowloon-12-with-kagaribi': 'sp-ultimate-singles',
-    'genesis-x': 'ultimate-singles',
-    'supernova-2024': 'ultimate-1v1-singles',
-    "ultimate-fighting-arena-2024-3": "super-smash-bros-ultimate-solo-switch",
-    "s-factor-11": "smash-bros-ultimate-singles",
-    "pre-s-factor-11": "ultimate-singles",
-    "ceo-2024-6": "super-smash-bros-ultimate-1v1",
-    "the-coinbox-105": "ultimate-singles",
-    "the-to-go-box-3-ultimate-final-smash-meter-on": "ultimate-singles",
-    "the-to-go-box-2-ultimate-sonic-steve-pikachu-banned": "ultimate-singles",
-    "con-2024-7": "ssbu-1v1",
-    "the-coinbox-102": "ultimate-singles",
-    "get-on-my-level-x-canadian-fighting-game-championships": "super-smash-bros-ultimate-singles",
-    "delta-8": "singles",
-    "lvl-up-expo-2024": "smash-ultimate-singles-starts-saturday",
-    "kroger-gaming-presents-the-luminosity-invitational": "ultimate-singles",
-    "diamond-dust": "ultimate-singles",
-    "battle-of-bc-6-7": "ultimate-singles",
-    "the-pregame-bobc6-pre-event": "ultimate-singles",
-    "the-coinbox-97-steve-banned": "ultimate-singles",
-    "best-of-the-west-ii-misfire": "ultimate-singles",
-    "the-coinbox-96-steve-banned": "ultimate-singles",
-    "collision-2024-6": "ultimate-singles",
-    "the-coinbox-95-steve-banned": "ultimate-singles",
-    "bonito-harbor": "ultimate-singles",
-    "cirque-du-cfl-3-ft-zomba-moist-light-miya-asimo": "smash-ultimate-1v1",
-    "the-coinbox-94-steve-unbanned": "ultimate-singles",
-    "the-coinbox-93-steve-banned": "ultimate-singles",
-    "king-con": "ssbu-1v1",
-    "d-jo-106": "ultimate-singles",
-    "pre-genesis-x-at-guildhouse-ultimate-melee-sf6": "smash-ultimate-singles-switch-6-00-pm",
-    "the-coinbox-89-steve-banned": "ultimate-singles",
-    "the-coinbox-87": "ultimate-singles",
-    "9with": "kowloon",
-    "sp-10-umeburasp-10": "singles",
-    "luminosity-makes-big-moves-2024": "ultimate-singles",
-    "the-coinbox-110": "ultimate-singles",
-    "regen-2024": "ultimate-singles-sat-sun",
-    "riptide-2024-5": "ultimate-singles",
-}
-
-
 def get_tournaments(result):
-    tournaments = result['data']['player']['user']['tournaments']['nodes']
+    tournaments = result['data']['player']['user']['events']['nodes']
     for tournament in tournaments:
-        slug = tournament['slug'].removeprefix('tournament/')
-        tournament['event'] = TOURNAMENT_TO_EVENT.get(slug, '')
-        tournament['slug'] = slug
+        tournament['name'] = tournament['tournament']['name']
+        del tournament['tournament']
     return tournaments
 
 
@@ -182,7 +140,7 @@ def make_df(gamertag, tournaments):
     df = pd.DataFrame(tournaments)
     df = df.drop_duplicates().reset_index(drop=True)
     df['gamertag'] = gamertag
-    reordered_df = df[['gamertag', 'name', 'slug', 'startAt', 'event']]
+    reordered_df = df[['gamertag', 'name', 'slug', 'startAt']]
     return reordered_df
 
 
@@ -214,7 +172,7 @@ def lambda_handler(event, context):
         {"gamertag": "Kola", "id": 18802},
     ]
     
-    event_df = pd.DataFrame(columns=['gamertag', 'name', 'slug', 'startAt', 'event'])
+    event_df = pd.DataFrame(columns=['gamertag', 'name', 'slug', 'startAt'])
     for player in players:
         tournaments = get_all_tournaments(player['id'])
         df = make_df(player['gamertag'], tournaments)
@@ -231,13 +189,37 @@ def lambda_handler(event, context):
             'slug': group['slug'].iloc[0],
             'startAt': group['startAt'].iloc[0],
             'gamertag': group['gamertag'].tolist(),
-            'event': group['event'].iloc[0],
         }
         for _, group in sorted_grouped_data
     ]
-    
-    tournaments_json = json.dumps(tournaments)
-    
+
+    def get_tournaments_by_name(tournaments, name):
+        tournaments_by_name = [tournament for tournament in tournaments if tournament['name'] == name]
+        return tournaments_by_name
+
+    def dedupe_tournaments(tournaments):
+        max_players = 0
+        max_idx = -1
+        for i, tournament in enumerate(tournaments):
+            players = tournament['gamertag']
+            num_players = len(players)
+            if num_players > max_players:
+                max_players = num_players
+                max_idx = i
+        return tournaments[max_idx:max_idx+1]
+
+    tournament_names = event_df.name.unique()
+    deduped_tournaments = []
+    for name in tournament_names:
+        tournaments_by_name = get_tournaments_by_name(tournaments, name)
+        if len(tournaments_by_name) == 1:
+            deduped_tournaments.append(tournaments_by_name[0])
+        else:
+            deduped_tournaments.append(dedupe_tournaments(tournaments_by_name)[0])
+
+    sorted_tournaments = list(sorted(deduped_tournaments, key=lambda x: x['startAt'], reverse=True))
+
+    tournaments_json = json.dumps(sorted_tournaments)
 
     #
     # Compare and see if there's a new tournament
