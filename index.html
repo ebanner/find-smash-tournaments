@@ -46,7 +46,6 @@
             var { tournaments, players } = data;
 
             tournaments = tournaments.filter(tournament => tournament.gamertag.length > 1)
-            tournaments.reverse()
 
             // Make dense tournament participants
             for (const tournament of tournaments) {
