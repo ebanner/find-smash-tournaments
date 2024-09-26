@@ -3,6 +3,8 @@ import pandas as pd
 from datetime import datetime
 import requests
 
+import difflib
+
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -225,10 +227,22 @@ def lambda_handler(event, context):
     # Compare and see if there's a new tournament
     #
     existing_tournaments = get('tournaments.json')
-    if tournaments_json != existing_tournaments:
+
+    tournaments_json_pretty = json.dumps(json.loads(tournaments_json), indent=4)
+    existing_tournaments_json_pretty = json.dumps(json.loads(existing_tournaments), indent=4)
+
+    if tournaments_json_pretty != existing_tournaments_json_pretty:
+        diff = difflib.unified_diff(
+            tournaments_json_pretty.splitlines(),
+            existing_tournaments_json_pretty.splitlines(),
+            fromfile='Tournaments',
+            tofile='Existing tournaments',
+            lineterm=''
+        )
+        diff_str = ('\n'.join(line for line in diff))
         send_email(
             'New tournament added!',
-            'Check https://ebanner.github.io/find-smash-tournaments for updates.'
+            diff_str
         )
 
     put('tournaments.json', tournaments_json)
