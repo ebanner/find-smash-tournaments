@@ -20,3 +20,17 @@
 result = json.loads(secret)
 return result[secret_name]
 ```
+
+## Edit role
+
+<img width="1158" alt="image" src="https://github.com/user-attachments/assets/ff9ccf16-c26d-473e-a0b7-e1f73951b067">
+
+## Add permissions -> Attach policies
+
+<img width="1158" alt="image" src="https://github.com/user-attachments/assets/00e1cff9-fb18-4439-9ec9-e62764e469c7">
+
+## Add permission policy SecretsManagerReadWrite
+
+<img width="1158" alt="image" src="https://github.com/user-attachments/assets/6ceb04a7-85cd-4a3f-945e-3a2281920d10">
+
+## Paste code into lambda function
