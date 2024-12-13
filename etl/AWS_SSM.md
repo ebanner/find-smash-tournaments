@@ -1,5 +1,9 @@
 # Use AWS SSM from Lambda
 
+*Secret*
+
+*SSM*
+
 - https://www.youtube.com/watch?v=90AqkOmhVhc&t=124s
 
 ## Store a new secret
