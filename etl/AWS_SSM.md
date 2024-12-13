@@ -25,6 +25,12 @@ result = json.loads(secret)
 return result[secret_name]
 ```
 
+Import `json` at the top:
+
+```python
+import json
+```
+
 ## Edit role
 
 <img width="1158" alt="image" src="https://github.com/user-attachments/assets/ff9ccf16-c26d-473e-a0b7-e1f73951b067">
