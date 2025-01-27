@@ -3,6 +3,9 @@ import pandas as pd
 from datetime import datetime
 import requests
 
+from dotenv import load_dotenv
+load_dotenv()
+
 import os
 
 import boto3
@@ -108,7 +111,7 @@ def get_all_tournaments(player_id):
     return all_tournaments
 
 
-def lambda_handler(event, context):
+if __name__ == '__main__':
     players = [
         {"gamertag": "Tweek", "id": 15768},
         {"gamertag": "MkLeo", "id": 222927},
@@ -183,9 +186,3 @@ def lambda_handler(event, context):
     worksheet.clear()
     set_with_dataframe(worksheet, tournaments_df)
 
-    num_rows = len(tournaments_df)
-
-    return {
-        'statusCode': 200,
-        'body': f'Success - {num_rows} rows written to Google Sheets!'
-    }
